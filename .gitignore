@@ -11,3 +11,7 @@ node_modules/
 npm-debug.log*
 
 ARCHITECTURE.md
+
+.env
+charon.sqlite
+node_modules

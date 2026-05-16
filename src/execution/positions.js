@@ -2,6 +2,7 @@ import { now, json } from '../utils.js';
 import { numSetting, boolSetting, strategyById } from '../db/settings.js';
 import { db } from '../db/connection.js';
 import { firstPositiveNumber, marketCapFromGmgn, tokenPriceFromGmgn } from '../utils.js';
+import { marketCapFromBirdeye, tokenPriceFromBirdeye } from '../enrichment/birdeye.js';
 import { fetchGmgnTokenInfo } from '../enrichment/gmgn.js';
 import { fetchJupiterAsset, fetchJupiterHolders, fetchJupiterChartContext, fetchJupiterWalletPnl } from '../enrichment/jupiter.js';
 import { liveWalletPubkey } from '../liveExecutor.js';
@@ -162,15 +163,10 @@ export async function refreshPosition(position, { autoExit = true, jupiterPnl = 
   }
 
   // Profit Lock tiered floor
-  const plHighPct = position.entry_mcap > 0 ? ((highWaterMcap - position.entry_mcap) / position.entry_mcap) * 100 : 0;
-  if (!exitReason && plHighPct > 0) {
-    const plLocks = [{trigger:80,floor:60},{trigger:40,floor:30},{trigger:20,floor:12},{trigger:10,floor:5}];
-    for (const lock of plLocks) {
-      if (plHighPct >= lock.trigger && pnlPercent <= lock.floor) {
-        exitReason = "PROFIT_LOCK_FLOOR_" + lock.floor;
-        break;
-      }
-    }
+  const plHWP = position.entry_mcap > 0 ? ((highWaterMcap - position.entry_mcap) / position.entry_mcap) * 100 : 0;
+  if (!exitReason && plHWP > 0) {
+    const plT = [{trigger:80,floor:60},{trigger:40,floor:30},{trigger:20,floor:12},{trigger:10,floor:5}];
+    for (const lk of plT) { if (plHWP >= lk.trigger && pnlPercent <= lk.floor) { exitReason = "PROFIT_LOCK_FLOOR_" + lk.floor; break; } }
   }
 
   // Standard exit checks

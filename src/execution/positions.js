@@ -179,6 +179,18 @@ export async function refreshPosition(position, { autoExit = true, jupiterPnl = 
     }
   }
 
+  // Profit Lock tiered floor
+  const highWaterPercent = position.entry_mcap > 0 ? ((highWaterMcap - position.entry_mcap) / position.entry_mcap) * 100 : 0;
+  if (!exitReason && highWaterPercent > 0) {
+    const locks = [{trigger:80,floor:50},{trigger:40,floor:20},{trigger:15,floor:5}];
+    for (const lock of locks) {
+      if (highWaterPercent >= lock.trigger && pnlPercent <= lock.floor) {
+        exitReason = "PROFIT_LOCK_FLOOR_" + lock.floor;
+        break;
+      }
+    }
+  }
+
   // Standard exit checks
   if (!exitReason) {
     if (slHit) exitReason = 'SL';

@@ -70,7 +70,7 @@ export async function executeConfirmedIntent(chatId, intentId) {
     if (!freshRow.candidate.filters?.passed) {
       db.prepare('UPDATE trade_intents SET status = ?, updated_at_ms = ? WHERE id = ?').run('rejected_stale', now(), intentId);
       return bot.sendMessage(chatId, [
-        '🛑 <b>Trade intent rejected on fresh check</b>',
+        // '🛑 <b>Trade intent rejected on fresh check</b>',
         '',
         candidateSummary(freshRow.candidate, decision),
         '',

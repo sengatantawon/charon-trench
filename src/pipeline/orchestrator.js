@@ -140,13 +140,13 @@ export async function handleApprovedBuy(selectedRow, decision, batchId, rows = [
         refreshedAtMs: freshSelectedRow.candidate.executionRefresh?.refreshedAtMs,
       },
     });
-    await sendTelegram([
-      '🛑 <b>Execution rejected on fresh check</b>',
-      '',
-      candidateSummary(freshSelectedRow.candidate, decision),
-      '',
-      `Failures: ${escapeHtml((freshSelectedRow.candidate.filters?.failures || []).join('; ') || 'fresh execution guard failed')}`,
-    ].join('\n'));
+//     await sendTelegram([
+//       // '🛑 <b>Execution rejected on fresh check</b>',
+//       '',
+//       candidateSummary(freshSelectedRow.candidate, decision),
+//       '',
+//       `Failures: ${escapeHtml((freshSelectedRow.candidate.filters?.failures || []).join('; ') || 'fresh execution guard failed')}`,
+//     ].join('\n'));
     return;
   }
 

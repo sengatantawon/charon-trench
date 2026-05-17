@@ -3,7 +3,7 @@ import { numSetting, boolSetting, strategyById } from '../db/settings.js';
 import { db } from '../db/connection.js';
 import { firstPositiveNumber, marketCapFromGmgn, tokenPriceFromGmgn } from '../utils.js';
 import { marketCapFromBirdeye, tokenPriceFromBirdeye } from '../enrichment/birdeye.js';
-import { fetchGmgnTokenInfo } from '../enrichment/gmgn.js';
+import { fetchBirdeyeTokenInfo as fetchGmgnTokenInfo } from '../enrichment/birdeye.js';
 import { fetchJupiterAsset, fetchJupiterHolders, fetchJupiterChartContext, fetchJupiterWalletPnl } from '../enrichment/jupiter.js';
 import { liveWalletPubkey } from '../liveExecutor.js';
 import { fetchSavedWalletExposure } from '../enrichment/wallets.js';
@@ -17,9 +17,9 @@ import { sendPositionExit } from '../telegram/send.js';
 export async function freshEntryMarket(mint, candidate) {
   const gmgn = await fetchGmgnTokenInfo(mint, false);
   const asset = await fetchJupiterAsset(mint, { useCache: false });
-  const priceUsd = firstPositiveNumber(tokenPriceFromGmgn(gmgn), asset?.usdPrice, candidate.metrics?.priceUsd);
+  const priceUsd = firstPositiveNumber(tokenPriceFromBirdeye(gmgn), asset?.usdPrice, candidate.metrics?.priceUsd);
   const marketCapUsd = firstPositiveNumber(
-    marketCapFromGmgn(gmgn),
+    marketCapFromBirdeye(gmgn),
     asset?.mcap,
     asset?.fdv,
     candidate.metrics?.marketCapUsd,
@@ -40,9 +40,9 @@ export async function refreshCandidateForExecution(row) {
   const selectedSavedWalletExposure = selectedHolders
     ? await fetchSavedWalletExposure(mint, selectedHolders)
     : candidate.savedWalletExposure;
-  const priceUsd = firstPositiveNumber(tokenPriceFromGmgn(gmgn), asset?.usdPrice, selectedTrending?.price, candidate.metrics?.priceUsd);
+  const priceUsd = firstPositiveNumber(tokenPriceFromBirdeye(gmgn), asset?.usdPrice, selectedTrending?.price, candidate.metrics?.priceUsd);
   const marketCapUsd = firstPositiveNumber(
-    marketCapFromGmgn(gmgn),
+    marketCapFromBirdeye(gmgn),
     asset?.mcap,
     asset?.fdv,
     selectedTrending?.market_cap,

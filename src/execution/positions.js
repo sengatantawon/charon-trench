@@ -165,7 +165,7 @@ export async function refreshPosition(position, { autoExit = true, jupiterPnl = 
   // Profit Lock tiered floor
   const plHWP = position.entry_mcap > 0 ? ((highWaterMcap - position.entry_mcap) / position.entry_mcap) * 100 : 0;
   if (!exitReason && plHWP > 0) {
-    const plT = [{trigger:80,floor:60},{trigger:40,floor:30},{trigger:20,floor:12},{trigger:10,floor:5}];
+    const plT = [{trigger:100,floor:70},{trigger:60,floor:40},{trigger:30,floor:15},{trigger:15,floor:5}];
     for (const lk of plT) { if (plHWP >= lk.trigger && pnlPercent <= lk.floor) { exitReason = "PROFIT_LOCK_FLOOR_" + lk.floor; break; } }
   }
 

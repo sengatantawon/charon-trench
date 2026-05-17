@@ -52,3 +52,4 @@ export function validateConfig() {
   }
   if (GMGN_ENABLED && !GMGN_API_KEY) throw new Error('GMGN_API_KEY is required unless GMGN_ENABLED=false.');
 }
+export const BIRDEYE_API_KEY = process.env.BIRDEYE_API_KEY || '';

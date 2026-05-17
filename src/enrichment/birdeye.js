@@ -1,4 +1,4 @@
-import { HELIUS_API_KEY } from '../config.js';
+import { BIRDEYE_API_KEY } from '../config.js';
 
 const BIRDEYE_BASE = 'https://public-api.birdeye.so';
 const RUGCHECK_BASE = 'https://api.rugcheck.xyz/v1';
@@ -14,7 +14,7 @@ async function fetchBirdeyeTokenInfo(mint, useCache = true) {
   try {
     const [overviewRes, rugRes] = await Promise.allSettled([
       fetch(`${BIRDEYE_BASE}/defi/token_overview?address=${mint}`, {
-        headers: { 'X-API-KEY': HELIUS_API_KEY || 'public', 'x-chain': 'solana' }
+        headers: { 'X-API-KEY': BIRDEYE_API_KEY || '', 'x-chain': 'solana' }
       }),
       fetch(`${RUGCHECK_BASE}/tokens/${mint}/report/summary`)
     ]);

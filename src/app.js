@@ -37,6 +37,17 @@ export async function startCharon() {
     setInterval(() => trackDip(() => monitorPriceAlerts()), 10_000);
     setInterval(() => cleanupAlerts(), 60 * 60 * 1000);
 
+    // Axiom trending source
+    const { fetchAxiomTrending, axiom } = await import('./signals/axiomSource.js');
+    const AXIOM_POLL_MS = Number(process.env.AXIOM_POLL_MS || 60_000);
+    if (process.env.AXIOM_CF_CLEARANCE) {
+      await fetchAxiomTrending('1h').catch(err => console.log(`[axiom] initial fetch failed: ${err.message}`));
+      setInterval(() => fetchAxiomTrending('1h').catch(err => console.log(`[axiom] ${err.message}`)), AXIOM_POLL_MS);
+      console.log('[axiom] trending source enabled');
+    } else {
+      console.log('[axiom] skipped (no AXIOM_CF_CLEARANCE)');
+    }
+
     console.log(`[bot] ${APP_NAME} started (server mode: ${SIGNAL_SERVER_URL})`);
   } else {
     // ── Standalone mode: direct polling (legacy) ───────────────────────────

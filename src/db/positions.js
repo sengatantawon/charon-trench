@@ -73,7 +73,7 @@ export function createDryRunPosition(candidateId, candidate, decision, reason = 
       VALUES (?, ?, 'buy', ?, ?, ?, ?, ?, ?, ?)
     `).run(positionId, candidate.token.mint, now(), entryPrice, entryMcap, sizeSol, null, reason, json({ candidateId, decision }));
     db.prepare(`
-      INSERT INTO tp_sl_rules (position_id, tp_percent, sl_percent, trailing_enabled, trailing_percent, updated_at_ms)
+      INSERT OR IGNORE INTO tp_sl_rules (position_id, tp_percent, sl_percent, trailing_enabled, trailing_percent, updated_at_ms)
       VALUES (?, ?, ?, ?, ?, ?)
     `).run(positionId, tp, sl, trailingEnabled, trailingPercent, now());
     return positionId;
@@ -130,7 +130,7 @@ export function createLivePosition(candidateId, candidate, decision, swap, reaso
       VALUES (?, ?, 'buy', ?, ?, ?, ?, ?, ?, ?)
     `).run(positionId, candidate.token.mint, now(), entryPrice, entryMcap, sizeSol, null, reason, json({ candidateId, decision, swap }));
     db.prepare(`
-      INSERT INTO tp_sl_rules (position_id, tp_percent, sl_percent, trailing_enabled, trailing_percent, updated_at_ms)
+      INSERT OR IGNORE INTO tp_sl_rules (position_id, tp_percent, sl_percent, trailing_enabled, trailing_percent, updated_at_ms)
       VALUES (?, ?, ?, ?, ?, ?)
     `).run(positionId, tp, sl, trailingEnabled, trailingPercent, now());
     return positionId;

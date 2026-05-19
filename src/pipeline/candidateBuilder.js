@@ -5,6 +5,7 @@ import { fetchJupiterAsset, fetchJupiterHolders, fetchJupiterChartContext } from
 import { fetchSavedWalletExposure } from '../enrichment/wallets.js';
 import { fetchTwitterNarrative } from '../enrichment/twitter.js';
 import { gmgnLink } from '../format.js';
+import { axiom } from '../signals/axiomSource.js';
 
 export function buildFeeSnapshot(fee, signature) {
   return {
@@ -112,6 +113,20 @@ export function filterCandidate(candidate) {
     }
   }
 
+  // Axiom filters
+  if (candidate.axiomToken) {
+    const axiomHot = Number(candidate.axiomToken.hot_level ?? 0);
+    const axiomSmart = Number(candidate.axiomToken.smart_degen_count ?? 0);
+    const minAxiomSmart = strat.min_axiom_smart_money ?? 0;
+    const minAxiomHot = strat.min_axiom_hot_level ?? 0;
+    if (minAxiomSmart > 0 && axiomSmart < minAxiomSmart) {
+      failures.push(`axiom smart money: ${axiomSmart} < ${minAxiomSmart}`);
+    }
+    if (minAxiomHot > 0 && axiomHot < minAxiomHot) {
+      failures.push(`axiom hot level: ${axiomHot} < ${minAxiomHot}`);
+    }
+  }
+
   return { passed: failures.length === 0, failures, strategy: strat.id };
 }
 
@@ -123,6 +138,7 @@ export async function buildCandidate({ mint, fee = null, signature = null, gradu
   const chart = await fetchJupiterChartContext(mint);
   const savedWalletExposure = await fetchSavedWalletExposure(mint, holders);
   const twitterNarrative = await fetchTwitterNarrative(graduatedCoin || jupiterAsset, gmgn);
+  const axiomToken = axiom.get(mint) || null;
   const priceUsd = firstPositiveNumber(tokenPriceFromGmgn(gmgn), jupiterAsset?.usdPrice, trendingToken?.price);
   const marketCapUsd = firstPositiveNumber(
     marketCapFromGmgn(gmgn),
@@ -161,6 +177,10 @@ export async function buildCandidate({ mint, fee = null, signature = null, gradu
       trendingSwaps: Number(trendingToken?.swaps ?? 0),
       trendingHotLevel: Number(trendingToken?.hot_level ?? 0),
       trendingSmartDegenCount: Number(trendingToken?.smart_degen_count ?? 0),
+      axiomHotLevel: Number(axiomToken?.hot_level ?? 0),
+      axiomSmartMoney: Number(axiomToken?.smart_degen_count ?? 0),
+      axiomVolume: Number(axiomToken?.volume ?? 0),
+      axiomHolders: Number(axiomToken?.holder_count ?? 0),
     },
     signals: {
       route: signalRoute,
@@ -174,10 +194,12 @@ export async function buildCandidate({ mint, fee = null, signature = null, gradu
       hasTrending: Boolean(trendingToken),
       triggerSignature: signature,
       strategy: strat.id,
+      hasAxiom: Boolean(axiomToken),
     },
     graduation: graduatedCoin,
     trending: trendingToken,
     feeClaim: fee ? buildFeeSnapshot(fee, signature) : null,
+    axiomToken,
     gmgn,
     jupiterAsset,
     holders,

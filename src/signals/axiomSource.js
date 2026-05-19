@@ -12,11 +12,6 @@ export async function fetchAxiomTrending(timePeriod = '1h') {
       origin: 'https://axiom.trade',
       referer: 'https://axiom.trade/',
     };
-    const cfClearance = process.env.AXIOM_CF_CLEARANCE;
-    if (cfClearance) {
-      headers.cookie = `cf_clearance=${cfClearance}`;
-    }
-
     const res = await axios.get(url, { timeout: 15_000, headers });
     const raw = Array.isArray(res.data) ? res.data : [];
     const seenAt = Date.now();

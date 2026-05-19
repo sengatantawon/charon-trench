@@ -84,7 +84,7 @@ async function fetchTwitterNarrative(graduatedCoin, gmgn) {
   try {
     const apiUrl = toFxTwitterApi(url);
     const api = await axios.get(apiUrl, {
-      timeout: 8000,
+      timeout: 12000,
       headers: { Accept: 'application/json' },
     });
     const text = extractTweetTextFromFx(api.data);
@@ -97,7 +97,7 @@ async function fetchTwitterNarrative(graduatedCoin, gmgn) {
   try {
     const fxUrl = toFxTwitter(url);
     const res = await axios.get(fxUrl, {
-      timeout: 8000,
+      timeout: 12000,
       headers: { Accept: 'text/html,application/json' },
     });
     const text = extractTweetTextFromFx(res.data);

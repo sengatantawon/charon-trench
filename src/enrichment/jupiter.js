@@ -63,7 +63,7 @@ async function fetchJupiterAsset(mint, { useCache = true, ttlMs = 20_000 } = {})
     const url = new URL('https://datapi.jup.ag/v1/assets/search');
     url.searchParams.set('query', mint);
     const res = await axios.get(url.toString(), {
-      timeout: 10_000,
+      timeout: 20000,
       headers: JSON_HEADERS,
     });
     const rows = Array.isArray(res.data) ? res.data : [];
@@ -80,7 +80,7 @@ async function fetchJupiterAsset(mint, { useCache = true, ttlMs = 20_000 } = {})
 async function fetchSolUsdPrice() {
   try {
     const res = await axios.get(`https://lite-api.jup.ag/price/v3?ids=${WSOL_MINT}`, {
-      timeout: 5000,
+      timeout: 20000 / 2,
       headers: JSON_HEADERS,
     });
     const price = Number(res.data?.[WSOL_MINT]?.usdPrice);
@@ -101,7 +101,7 @@ async function estimateTokenAmountFromSol(sizeSol, entryPrice) {
 async function fetchJupiterHolders(mint) {
   try {
     const res = await axios.get(`https://datapi.jup.ag/v1/holders/${mint}`, {
-      timeout: 10_000,
+      timeout: 20000,
       headers: JSON_HEADERS,
     });
     const holders = Array.isArray(res.data?.holders) ? res.data.holders : [];
@@ -164,7 +164,7 @@ async function fetchJupiterChartWindow(mint, interval, candles, label) {
   url.searchParams.set('type', 'price');
   url.searchParams.set('quote', 'native');
   const res = await axios.get(url.toString(), {
-    timeout: 10_000,
+    timeout: 20000,
     headers: JSON_HEADERS,
   });
   return summarizeCandles(label, Array.isArray(res.data?.candles) ? res.data.candles : []);
@@ -211,7 +211,7 @@ async function fetchJupiterWalletPnl(walletAddress) {
     const url = new URL('https://datapi.jup.ag/v1/pnl');
     url.searchParams.set('addresses', walletAddress);
     url.searchParams.set('includeClosed', 'false');
-    const res = await axios.get(url.toString(), { timeout: 10_000, headers: JSON_HEADERS });
+    const res = await axios.get(url.toString(), { timeout: 20000, headers: JSON_HEADERS });
     const data = res.data?.[walletAddress] || {};
     for (const mint of IGNORED_PNL_MINTS) delete data[mint];
     return data;
